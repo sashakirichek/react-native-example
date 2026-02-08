@@ -5,13 +5,25 @@ import MenuScreen from "./MenuScreen";
 import WelcomeScreen from "./WelcomeScreen";
 import { useColorScheme } from "react-native";
 import {Ionicons} from "@expo/vector-icons"
+import * as Device from 'expo-device';
+import { useEffect, useState } from "react";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 export default function RootLayout() {
+  const [isTablet, setIsTablet] = useState<boolean>();
   const colorScheme = useColorScheme();
-  return <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-    {/* <Stack.Navigator initialRouteName="Welcome"
+   function getDeviceType() {
+const deviceType =  Device.getDeviceTypeAsync().then(deviceType => {
+  if (deviceType === Device.DeviceType.TABLET) {
+  setIsTablet(true)
+} else {
+  setIsTablet(false)
+}
+})}
+  useEffect(() => getDeviceType(), []) 
+
+  const stackNav = <Stack.Navigator initialRouteName="Welcome"
   screenOptions={{ 
     headerTitleStyle: {color: colorScheme === 'light' ? '#000' : '#fff', fontWeight: 'bold'},
     headerStyle: {backgroundColor : colorScheme === 'light' ? '#fff' : '#000'}}}>
@@ -22,8 +34,9 @@ export default function RootLayout() {
           {headerShown: true, animation: 'ios_from_right'}
         } />
         
-      </Stack.Navigator>  */}
-      <Tab.Navigator  initialRouteName="Welcome"
+      </Stack.Navigator>
+
+        const tabNav = <Tab.Navigator  initialRouteName="Welcome"
   screenOptions={({route}) => ({ 
     tabBarIcon: ({focused, color, size}) => {
       let iconName; 
@@ -46,6 +59,10 @@ return <Ionicons name={iconName} size={size} color={color}/>
           {headerShown: true, }
         } />
         
-      </Tab.Navigator></ThemeProvider>
+      </Tab.Navigator>
+
+  return <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+   {isTablet ? stackNav : tabNav}
+      </ThemeProvider>
     
 }
