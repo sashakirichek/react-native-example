@@ -1,33 +1,38 @@
 import { StyleSheet } from "react-native";
 
-export const commonStyles = StyleSheet.create({
+const commonStyles = StyleSheet.create({
   description: {
     color: "#000",
     fontSize: 22,
     textAlign: "center",
   },
   pressable: {
-    backgroundColor: "#3e524b",
-    borderRadius: 7,
+    backgroundColor: "#333",
     width: "100%",
-    padding: 10,
+    padding: 20,
     alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10,
   },
   pressableDisabled: {
     backgroundColor: "gray",
-    borderRadius: 7,
     width: "100%",
-    padding: 10,
+    padding: 20,
     alignItems: "center",
   },
   pressableText: {
     color: "#fff",
   },
   emailInput: {
-    padding: 10,
-    borderColor: "#3e524b",
-    borderWidth: 2,
-    borderRadius: 7,
     width: "100%",
+    color: "#fff",
+    marginBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#505050",
   },
 });
+
+export default commonStyles;

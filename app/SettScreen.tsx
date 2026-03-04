@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Text, useColorScheme, View, Pressable, StyleSheet, Switch, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
+import { Pressable, StyleSheet, Text, useColorScheme, View } from "react-native";
 
+import { menuItems } from "./_layout";
 import Toggle from "./components/Toggle";
 
 export default function SettScreen({ navigation }) {
@@ -23,7 +23,7 @@ export default function SettScreen({ navigation }) {
       <Toggle label="Push notification" toggleKey="pushNotification" storage={AsyncStorage} />
       <Toggle label="Marketing emails" toggleKey="marketingEmails" storage={AsyncStorage} />
       <Toggle label="Latest news" toggleKey="latestNews" storage={AsyncStorage} />
-      <Pressable style={styles.pressable} onPress={() => navigation.navigate("Menu")}>
+      <Pressable style={styles.pressable} onPress={() => navigation.navigate(menuItems.menu.name)}>
         <Text style={styles.pressableText}>Go to menu</Text>
       </Pressable>
       {/* <Pressable style={styles.pressable} onPress={() => navigation.goBack()}><Text style={styles.pressableText}>Go back</Text></Pressable> */}

@@ -1,17 +1,16 @@
-import { NavigationContainer, ThemeProvider, DefaultTheme, DarkTheme } from "@react-navigation/native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import MenuScreen from "./MenuScreen";
-import WelcomeScreen from "./WelcomeScreen";
-import { useColorScheme } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Device from "expo-device";
-import { JSX, useEffect, useState } from "react";
-import SettScreen from "./SettScreen";
 import { SQLiteProvider } from "expo-sqlite";
-import MenuList from "./MenuList";
+import { JSX, useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MenuList from "./CustomersList";
+import MenuScreen from "./MenuScreen";
+import SettScreen from "./SettScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -25,16 +24,24 @@ type MenuItem = {
 };
 
 export const menuItems: Record<string, MenuItem> = {
+  menu: { name: "Menu (API + DB)", icon: "heart", iconOutlined: "heart-outline", component: MenuScreen },
   welcome: { name: "Welcome", icon: "home", iconOutlined: "home-outline", component: WelcomeScreen },
-  menu: { name: "Menu (API)", icon: "heart", iconOutlined: "heart-outline", component: MenuScreen },
   menuList: {
-    name: "Menu (SQLite)",
+    name: "Customers (SQLite)",
     icon: "people-circle",
     iconOutlined: "people-circle-outline",
     component: MenuList,
   },
   settings: { name: "Settings", icon: "settings", iconOutlined: "settings-outline", component: SettScreen },
 };
+
+if (!__DEV__) {
+  console.log = () => null;
+  console.warn = () => null;
+  console.error = () => null;
+  console.info = () => null;
+  console.debug = () => null;
+}
 
 export default function RootLayout() {
   const [isTablet, setIsTablet] = useState<boolean>();
@@ -53,7 +60,7 @@ export default function RootLayout() {
   const menuItemsKeys = Object.keys(menuItems);
   const stackNav = (
     <Stack.Navigator
-      initialRouteName="Welcome"
+      initialRouteName={menuItems.menu.name}
       screenOptions={{
         headerTitleStyle: { color: colorScheme === "light" ? "#000" : "#fff", fontWeight: "bold" },
         headerStyle: { backgroundColor: colorScheme === "light" ? "#fff" : "#000" },
@@ -73,7 +80,7 @@ export default function RootLayout() {
   );
   const drawerNav = (
     <Drawer.Navigator
-      initialRouteName="Welcome"
+      initialRouteName={menuItems.menu.name}
       screenOptions={{
         drawerPosition: "right",
         headerTitleStyle: { color: colorScheme === "light" ? "#000" : "#fff", fontWeight: "bold" },
@@ -89,7 +96,7 @@ export default function RootLayout() {
 
   const tabNav = (
     <Tab.Navigator
-      initialRouteName="Welcome"
+      initialRouteName={menuItems.menu.name}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let menuItem = Object.keys(menuItems)
@@ -117,7 +124,8 @@ export default function RootLayout() {
       databaseName="userDatabase.db"
       onInit={async (db) => {
         await db.execAsync(
-          `CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY NOT NULL, name TEXT NOT NULL);`,
+          `CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY NOT NULL, name TEXT NOT NULL);
+          create table if not exists menuitems (id integer primary key not null, uuid text, title text, price text, category text);`,
         );
       }}
       options={{ useNewConnection: false }}
