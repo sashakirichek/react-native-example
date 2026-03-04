@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "little-lemon",
-    "slug": "little-lemon",
+    "name": "react-native-example",
+    "slug": "react-native-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "littlelemon",
+    "scheme": "react-native-example",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
