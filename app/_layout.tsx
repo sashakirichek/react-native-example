@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MenuList from "./CustomersList";
 import MenuScreen from "./MenuScreen";
 import SettScreen from "./SettScreen";
+import WelcomeScreen from "./WelcomeScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
