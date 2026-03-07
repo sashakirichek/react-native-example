@@ -1,0 +1,85 @@
+name: Build Unsigned IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: "Build configuration"
+        required: true
+        default: "Release"
+        type: choice
+        options:
+          - Release
+          - Debug
+      metro_host:
+        description: "Metro dev server hostname (Debug only, e.g. MurdocPC.local)"
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  build-ipa:
+    name: Build iOS (${{ inputs.configuration }})
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate native project (prebuild)
+        run: npx expo prebuild --platform ios --clean
+
+      - name: Set Metro host (Debug only)
+        if: inputs.configuration == 'Debug' && inputs.metro_host != ''
+        run: |
+          sed -i '' \
+            's|return RCTBundleURLProvider.sharedSettings().jsBundleURL|RCTBundleURLProvider.sharedSettings().jsLocation = "'"${{ inputs.metro_host }}"'"\n    return RCTBundleURLProvider.sharedSettings().jsBundleURL|' \
+            ios/reactnativeexample/AppDelegate.swift
+          echo "Patched AppDelegate.swift with metro host: ${{ inputs.metro_host }}"
+          cat ios/reactnativeexample/AppDelegate.swift
+
+      - name: Install CocoaPods
+        run: pod install
+        working-directory: ios
+
+      - name: Build .app
+        run: |
+          xcodebuild \
+            -workspace ios/reactnativeexample.xcworkspace \
+            -scheme reactnativeexample \
+            -configuration ${{ inputs.configuration }} \
+            -sdk iphoneos \
+            -derivedDataPath ios/build/DerivedData \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ARCHS="arm64" \
+            | xcpretty
+
+      - name: Package IPA
+        run: |
+          CONFIG="${{ inputs.configuration }}"
+          APP_PATH="ios/build/DerivedData/Build/Products/${CONFIG}-iphoneos/reactnativeexample.app"
+
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r reactnativeexample-${CONFIG,,}.ipa Payload/
+          rm -rf Payload
+
+          echo "IPA size: $(du -h reactnativeexample-${CONFIG,,}.ipa | cut -f1)"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reactnativeexample-${{ inputs.configuration }}-unsigned
+          path: reactnativeexample-*.ipa
+          retention-days: 30
