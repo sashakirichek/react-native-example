@@ -47,10 +47,6 @@ jobs:
           echo "Patched AppDelegate.swift with metro host: ${{ inputs.metro_host }}"
           cat ios/reactnativeexample/AppDelegate.swift
 
-      - name: Install CocoaPods
-        run: pod install
-        working-directory: ios
-
       - name: Build .app
         run: |
           xcodebuild \
@@ -68,14 +64,15 @@ jobs:
       - name: Package IPA
         run: |
           CONFIG="${{ inputs.configuration }}"
+          CONFIG_LOWER="$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')"
           APP_PATH="ios/build/DerivedData/Build/Products/${CONFIG}-iphoneos/reactnativeexample.app"
 
           mkdir -p Payload
           cp -r "$APP_PATH" Payload/
-          zip -r reactnativeexample-${CONFIG,,}.ipa Payload/
+          zip -r "reactnativeexample-${CONFIG_LOWER}.ipa" Payload/
           rm -rf Payload
 
-          echo "IPA size: $(du -h reactnativeexample-${CONFIG,,}.ipa | cut -f1)"
+          echo "IPA size: $(du -h "reactnativeexample-${CONFIG_LOWER}.ipa" | cut -f1)"
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
