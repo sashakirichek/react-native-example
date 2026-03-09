@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View, TextInput, useColorScheme } from "react-native";
-import { Customer } from "./db/database";
-import { commonStyles } from "./commonStyles";
 import { useSQLiteContext } from "expo-sqlite";
+import React, { useEffect, useRef, useState } from "react";
+import { Pressable, Text, TextInput, useColorScheme, View } from "react-native";
+import { commonStyles } from "./commonStyles";
+import { Customer } from "./db/database";
 
 export default function MenuList() {
   const [customerName, setCustomerName] = useState<string>("");
@@ -20,7 +20,6 @@ export default function MenuList() {
       console.log(JSON.stringify(allRows));
     })();
   }, []);
-  const textStyle = { color: colorScheme === "light" ? "#000" : "#fff" };
   return (
     <>
       <TextInput
@@ -50,7 +49,7 @@ export default function MenuList() {
             paddingTop: 10,
           }}
         >
-          <Text style={textStyle}>{mi}</Text>
+          <Text>{mi}</Text>
         </View>
       ))}
     </>

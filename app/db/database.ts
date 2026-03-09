@@ -14,9 +14,10 @@ export type MenuItem = {
   title: string;
   price: number;
   category: string;
+  styles: object;
 };
 
-export const sections = ["Appetizers", "Salads", "Beverages"];
+export const sections = ["All", "Appetizers", "Salads", "Beverages"];
 
 export type Customer = {
   id: number;

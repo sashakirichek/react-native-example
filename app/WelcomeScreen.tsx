@@ -1,42 +1,33 @@
-import { Button } from "@react-navigation/elements";
-import { Text, useColorScheme, View, Pressable, StyleSheet } from "react-native";
+import { useTheme } from "@react-navigation/native";
+import { Pressable, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { menuItems } from "./_layout";
+import { createCommonStyles } from "./commonStyles";
 
-export default function WelcomeScreen({ navigation }) {
-  const colorScheme = useColorScheme();
+export default function WelcomeScreen({ navigation }: { navigation: any }) {
+  const theme = useTheme();
+  const commonStyles = createCommonStyles(theme);
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
-        // justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: colorScheme === "light" ? "#fff" : "#000",
         paddingTop: 50,
+        padding: 16,
       }}
     >
-      <Text style={{ color: colorScheme === "light" ? "#000" : "#fff" }}>
-        Edit app/WelcomeScreen.tsx to edit this screen.
-      </Text>
-      <Pressable style={styles.pressable} onPress={() => navigation.navigate(menuItems.menu.name)}>
-        <Text style={styles.pressableText}>Go to menu</Text>
+      <Text style={commonStyles.header}>API fetching example with cache in database</Text>
+      <Pressable style={commonStyles.pressable} onPress={() => navigation.navigate(menuItems.menu.name)}>
+        <Text style={commonStyles.pressableText}>Go to menu</Text>
       </Pressable>
-      {/* <Pressable style={styles.pressable} onPress={() => navigation.goBack()}><Text style={styles.pressableText}>Go back</Text></Pressable> */}
-    </View>
+      <Text style={commonStyles.header}>DB only example</Text>
+      <Pressable style={commonStyles.pressable} onPress={() => navigation.navigate(menuItems.customers.name)}>
+        <Text style={commonStyles.pressableText}>Go to customers</Text>
+      </Pressable>
+      <Text style={commonStyles.header}>Settings</Text>
+      <Text style={commonStyles.text}>Uses deprecated AsyncStorage</Text>
+      <Pressable style={commonStyles.pressable} onPress={() => navigation.navigate(menuItems.settings.name)}>
+        <Text style={commonStyles.pressableText}>Go to settings</Text>
+      </Pressable>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  pressable: {
-    backgroundColor: "#333",
-    margin: 20,
-    height: 50,
-    width: 250,
-    borderRadius: 50,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pressableText: {
-    color: "#fff",
-  },
-});

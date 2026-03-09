@@ -1,38 +1,55 @@
 import { StyleSheet } from "react-native";
 
-const commonStyles = StyleSheet.create({
-  description: {
-    color: "#000",
-    fontSize: 22,
-    textAlign: "center",
-  },
-  pressable: {
-    backgroundColor: "#333",
-    width: "100%",
-    padding: 20,
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  pressableDisabled: {
-    backgroundColor: "gray",
-    width: "100%",
-    padding: 20,
-    alignItems: "center",
-  },
-  pressableText: {
-    color: "#fff",
-  },
-  emailInput: {
-    width: "100%",
-    color: "#fff",
-    marginBottom: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#505050",
-  },
-});
+export const createCommonStyles = (theme) => {
+  return StyleSheet.create({
+    description: {
+      fontSize: 22,
+      textAlign: "center",
+      color: theme.colors.text,
+    },
+    pressable: {
+      backgroundColor: theme.colors.border,
+      paddingVertical: 20,
+      paddingHorizontal: 30,
+      borderRadius: 50,
+      alignItems: "center",
+      marginTop: 10,
+      marginBottom: 10,
+    },
+    pressableDisabled: {
+      backgroundColor: theme.colors.border,
+      paddingVertical: 20,
+      paddingHorizontal: 80,
+      borderRadius: 50,
+      padding: 20,
+      alignItems: "center",
+    },
+    pressableText: {
+      color: theme.colors.text,
+    },
+    text: {
+      color: theme.colors.text,
+    },
+    emailInput: {
+      width: "100%",
+      color: theme.colors.text,
+      marginBottom: 20,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      marginTop: 24,
+      marginBottom: 12,
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "left",
+      color: theme.colors.text,
+    },
+  });
+};
 
-export default commonStyles;
+export default createCommonStyles;

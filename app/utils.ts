@@ -53,7 +53,7 @@ export function getSectionListData(data: MenuItem[]) {
   );
 }
 
-export function useUpdateEffect(effect, dependencies = []) {
+export function useUpdateEffect(effect: () => void | (() => void), dependencies: any[] = []) {
   const isInitialMount = useRef(true);
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Device from "expo-device";
 import { SQLiteProvider } from "expo-sqlite";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MenuList from "./CustomersList";
@@ -19,21 +19,46 @@ const Drawer = createDrawerNavigator();
 
 type MenuItem = {
   name: string;
+  title: string;
   icon: string;
   iconOutlined: string;
-  component: JSX.Element;
+  component: React.ComponentType<any>;
+  searchable: boolean;
 };
 
 export const menuItems: Record<string, MenuItem> = {
-  menu: { name: "Menu (API + DB)", icon: "heart", iconOutlined: "heart-outline", component: MenuScreen },
-  welcome: { name: "Welcome", icon: "home", iconOutlined: "home-outline", component: WelcomeScreen },
-  menuList: {
-    name: "Customers (SQLite)",
+  welcome: {
+    name: "Welcome",
+    title: "Welcome",
+    icon: "home",
+    iconOutlined: "home-outline",
+    component: WelcomeScreen,
+    searchable: false,
+  },
+  menu: {
+    name: "Menu",
+    title: "Menu (API + DB)",
+    searchable: true,
+    icon: "heart",
+    iconOutlined: "heart-outline",
+    component: MenuScreen,
+  },
+  customers: {
+    name: "Customers",
+    title: "Customers (SQLite)",
     icon: "people-circle",
     iconOutlined: "people-circle-outline",
     component: MenuList,
+    searchable: true,
   },
-  settings: { name: "Settings", icon: "settings", iconOutlined: "settings-outline", component: SettScreen },
+  settings: {
+    name: "Settings",
+    title: "Settings",
+    icon: "settings",
+    iconOutlined: "settings-outline",
+    component: SettScreen,
+    searchable: false,
+  },
 };
 
 if (!__DEV__) {
@@ -47,6 +72,7 @@ if (!__DEV__) {
 export default function RootLayout() {
   const [isTablet, setIsTablet] = useState<boolean>();
   const colorScheme = useColorScheme();
+  const initialPage = menuItems.welcome.name;
   function getDeviceType() {
     const deviceType = Device.getDeviceTypeAsync().then((deviceType) => {
       if (deviceType === Device.DeviceType.TABLET) {
@@ -61,7 +87,7 @@ export default function RootLayout() {
   const menuItemsKeys = Object.keys(menuItems);
   const stackNav = (
     <Stack.Navigator
-      initialRouteName={menuItems.menu.name}
+      initialRouteName={initialPage}
       screenOptions={{
         headerTitleStyle: { color: colorScheme === "light" ? "#000" : "#fff", fontWeight: "bold" },
         headerStyle: { backgroundColor: colorScheme === "light" ? "#fff" : "#000" },
@@ -72,7 +98,14 @@ export default function RootLayout() {
         return (
           <Stack.Screen
             name={menuItem.name}
-            options={{ headerShown: true, animation: "ios_from_right" }}
+            options={{
+              headerShown: true,
+              animation: "ios_from_right",
+              headerTitle: menuItem.title,
+              headerBlurEffect: "regular",
+              headerTransparent: true,
+              headerLargeTitle: true,
+            }}
             component={menuItem.component}
           />
         );
@@ -81,33 +114,48 @@ export default function RootLayout() {
   );
   const drawerNav = (
     <Drawer.Navigator
-      initialRouteName={menuItems.menu.name}
+      initialRouteName={initialPage}
       screenOptions={{
         drawerPosition: "right",
-        headerTitleStyle: { color: colorScheme === "light" ? "#000" : "#fff", fontWeight: "bold" },
-        headerStyle: { backgroundColor: colorScheme === "light" ? "#fff" : "#000" },
+        // headerTitleStyle: { color: colorScheme === "light" ? "#000" : "#fff", fontWeight: "bold" },
+        // headerStyle: { backgroundColor: colorScheme === "light" ? "#fff" : "#000" },
       }}
     >
       {menuItemsKeys.map((key: string) => {
         const menuItem = menuItems[key];
-        return <Drawer.Screen name={menuItem.name} options={{ headerShown: true }} component={menuItem.component} />;
+        return (
+          <Drawer.Screen
+            name={menuItem.name}
+            options={{
+              headerShown: true,
+              headerTitle: menuItem.title,
+              headerTransparent: true,
+            }}
+            component={menuItem.component}
+          />
+        );
       })}
     </Drawer.Navigator>
   );
 
   const tabNav = (
     <Tab.Navigator
-      initialRouteName={menuItems.menu.name}
+      initialRouteName={initialPage}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let menuItem = Object.keys(menuItems)
             .map((key) => menuItems[key])
             .find((mi) => mi.name === route.name);
 
-          return <Ionicons name={focused ? menuItem.icon : menuItem.iconOutlined} size={size} color={color} />;
+          if (!menuItem) return null;
+          return (
+            <Ionicons
+              name={focused ? (menuItem.icon as any) : (menuItem.iconOutlined as any)}
+              size={size}
+              color={color}
+            />
+          );
         },
-        tabBarActiveTintColor: "yellow",
-        tabBarInactiveTintColor: "gray",
 
         headerTitleStyle: { color: colorScheme === "light" ? "#000" : "#fff", fontWeight: "bold" },
         headerStyle: { backgroundColor: colorScheme === "light" ? "#fff" : "#000" },
@@ -115,7 +163,17 @@ export default function RootLayout() {
     >
       {menuItemsKeys.map((key: string) => {
         const menuItem = menuItems[key];
-        return <Tab.Screen name={menuItem.name} options={{ headerShown: true }} component={menuItem.component} />;
+        return (
+          <Tab.Screen
+            name={menuItem.name}
+            options={{
+              headerShown: true,
+              headerTitle: menuItem.title,
+              headerTransparent: true,
+            }}
+            component={menuItem.component}
+          />
+        );
       })}
     </Tab.Navigator>
   );

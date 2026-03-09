@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { Pressable, Switch, Text, useColorScheme, View, StyleSheet, Alert } from "react-native";
+import { Alert, StyleSheet, Switch, Text, useColorScheme, View } from "react-native";
 
 export default function Toggle({
   toggleKey,
@@ -51,19 +51,17 @@ export default function Toggle({
       style={{
         display: "flex",
         flexDirection: "row",
-        paddingLeft: 40,
-        paddingRight: 40,
+        paddingLeft: 16,
+        paddingRight: 16,
         paddingTop: 10,
         paddingBottom: 10,
         justifyContent: "space-beetween",
         alignItems: "center",
-        backgroundColor: colorScheme === "light" ? "#fff" : "#000",
         gap: 20,
       }}
     >
       <Text style={{ flex: 1, color: colorScheme === "light" ? "#000" : "#fff" }}>{label}</Text>
       <Switch
-        trackColor={{ false: "#767577", true: "yellow" }}
         // thumbColor={isPushNotificationsEnabled ? '#f5dd4b' : '#f4f3f4'}
         ios_backgroundColor="#3e3e3e"
         onValueChange={toggleSwitch}
