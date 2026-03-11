@@ -2,6 +2,12 @@ import { StyleSheet } from "react-native";
 
 export const createCommonStyles = (theme) => {
   return StyleSheet.create({
+    view: {
+      // justifyContent: "center",
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingTop: 70,
+    },
     description: {
       fontSize: 22,
       textAlign: "center",

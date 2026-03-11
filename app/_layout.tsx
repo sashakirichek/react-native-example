@@ -1,3 +1,4 @@
+import { ApolloProvider } from "@apollo/client/react";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -8,7 +9,9 @@ import { SQLiteProvider } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { client } from "./../apollo";
 import MenuList from "./CustomersList";
+import GraphQlExample from "./GraphQlExample";
 import MenuScreen from "./MenuScreen";
 import SettScreen from "./SettScreen";
 import WelcomeScreen from "./WelcomeScreen";
@@ -51,9 +54,17 @@ export const menuItems: Record<string, MenuItem> = {
     component: MenuList,
     searchable: true,
   },
+  graphql: {
+    name: "GraphQL",
+    title: "GraphQL",
+    icon: "fish",
+    iconOutlined: "fish-outline",
+    component: GraphQlExample,
+    searchable: false,
+  },
   settings: {
     name: "Settings",
-    title: "Settings",
+    title: "Settings (legacy AsyncStorage)",
     icon: "settings",
     iconOutlined: "settings-outline",
     component: SettScreen,
@@ -191,7 +202,7 @@ export default function RootLayout() {
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-          {isTablet ? drawerNav : tabNav}
+          <ApolloProvider client={client}>{isTablet ? drawerNav : tabNav}</ApolloProvider>
         </ThemeProvider>
       </GestureHandlerRootView>
     </SQLiteProvider>

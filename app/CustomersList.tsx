@@ -45,14 +45,7 @@ export default function MenuList() {
   }, [customers, query]);
 
   return (
-    <SafeAreaView
-      style={{
-        // justifyContent: "center",
-        flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 50,
-      }}
-    >
+    <SafeAreaView style={commonStyles.view}>
       <ScrollView
         // contentInset={{ top: 80, bottom: 20 }} // Extra scroll padding
         contentInsetAdjustmentBehavior="automatic" // Adjust for safe area automatically

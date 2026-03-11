@@ -108,7 +108,7 @@ export default function MenuScreen() {
   const colorScheme = useColorScheme();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={commonStyles.view}>
       <SectionList
         style={styles.sectionList}
         sections={data}

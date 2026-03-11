@@ -12,15 +12,7 @@ export default function SettScreen({ navigation }) {
   const styles = createStyles(theme);
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        // justifyContent: "center",
-        alignItems: "center",
-        paddingTop: 50,
-        backgroundColor: theme.colors.background,
-      }}
-    >
+    <SafeAreaView style={commonStyles.view}>
       <Toggle label="Push notification" toggleKey="pushNotification" storage={AsyncStorage} />
       <Toggle label="Marketing emails" toggleKey="marketingEmails" storage={AsyncStorage} />
       <Toggle label="Latest news" toggleKey="latestNews" storage={AsyncStorage} />
