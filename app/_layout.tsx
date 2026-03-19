@@ -11,6 +11,7 @@ import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { client } from "./../apollo";
 import MenuList from "./CustomersList";
+import Earth from "./Earth";
 import GraphQlExample from "./GraphQlExample";
 import MenuScreen from "./MenuScreen";
 import SettScreen from "./SettScreen";
@@ -68,6 +69,14 @@ export const menuItems: Record<string, MenuItem> = {
     icon: "settings",
     iconOutlined: "settings-outline",
     component: SettScreen,
+    searchable: false,
+  },
+  earth: {
+    name: "Earth",
+    title: "Earth (sensors)",
+    icon: "planet",
+    iconOutlined: "planet-outline",
+    component: Earth,
     searchable: false,
   },
 };

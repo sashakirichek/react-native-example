@@ -35,6 +35,11 @@ export const createCommonStyles = (theme) => {
     },
     text: {
       color: theme.colors.text,
+      marginVertical: 5,
+    },
+    error: {
+      color: "red",
+      marginVertical: 5,
     },
     emailInput: {
       width: "100%",
@@ -54,6 +59,11 @@ export const createCommonStyles = (theme) => {
       fontWeight: "bold",
       textAlign: "left",
       color: theme.colors.text,
+    },
+    bigText: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: "white",
     },
   });
 };
