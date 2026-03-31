@@ -78,11 +78,7 @@ export default function RootLayout() {
   const colors = getColors(isDark);
 
   return (
-    <SQLiteProvider
-      databaseName="knowledge.db"
-      onInit={initDatabase}
-      options={{ useNewConnection: false }}
-    >
+    <SQLiteProvider databaseName="knowledge.db" onInit={initDatabase} options={{ useNewConnection: false }}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
           <Stack

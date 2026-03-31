@@ -1,4 +1,4 @@
-import { extractSentences, extractKeyTerms, contentHash, getExcerpt } from "./text-processing";
+import { contentHash, extractKeyTerms, extractSentences, getExcerpt } from "./text-processing";
 
 export type GeneratedMemo = {
   content: string;
@@ -11,11 +11,7 @@ export type GeneratedMemo = {
  *
  * Works on all iOS versions — no AI model required.
  */
-export function generateMemo(
-  topicName: string,
-  content: string,
-  references: string[] = [],
-): GeneratedMemo {
+export function generateMemo(topicName: string, content: string, references: string[] = []): GeneratedMemo {
   const sentences = extractSentences(content);
   const keyTerms = extractKeyTerms(content, 10);
   const hash = contentHash(content);
@@ -49,9 +45,7 @@ export function generateMemo(
       developSection.push(`- ${s}`);
     }
     if (developSentences.length > 10) {
-      developSection.push(
-        `- *(${developSentences.length - 10} more points in source material)*`,
-      );
+      developSection.push(`- *(${developSentences.length - 10} more points in source material)*`);
     }
   } else {
     developSection.push("*Add more source material to expand this section.*");

@@ -1,34 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from "react-native";
 import {
   deleteTopic,
   getMemo,
   getQuizQuestions,
   getReferences,
   getTopic,
-  saveQuizQuestions,
   saveMemo,
+  saveQuizQuestions,
   type Memo,
-  type QuizQuestion,
-  type QuizOption,
   type Reference,
   type Topic,
 } from "../db/repository";
-import { generateQuizQuestions } from "../lib/quiz-generator";
 import { generateMemo } from "../lib/memo-generator";
+import { generateQuizQuestions } from "../lib/quiz-generator";
 import { getExcerpt } from "../lib/text-processing";
 import { getColors, iOS18Components, iOS18Typography } from "../theme/ios18";
 
@@ -72,8 +61,7 @@ export default function TopicDetailScreen() {
     );
   }
 
-  const sourceContent =
-    topic.source_snapshot || topic.raw_text || "";
+  const sourceContent = topic.source_snapshot || topic.raw_text || "";
 
   const handleGenerateMemo = async () => {
     if (!sourceContent) {
@@ -146,9 +134,7 @@ export default function TopicDetailScreen() {
       {sourceContent ? (
         <View style={[styles.section, { backgroundColor: colors.secondaryGroupedBackground }]}>
           <Text style={[styles.sectionTitle, { color: colors.label }]}>Source Content</Text>
-          <Text style={[styles.previewText, { color: colors.secondaryLabel }]}>
-            {getExcerpt(sourceContent, 300)}
-          </Text>
+          <Text style={[styles.previewText, { color: colors.secondaryLabel }]}>{getExcerpt(sourceContent, 300)}</Text>
         </View>
       ) : (
         <View style={[styles.section, { backgroundColor: colors.secondaryGroupedBackground }]}>
@@ -184,9 +170,7 @@ export default function TopicDetailScreen() {
           disabled={generating}
         >
           <Ionicons name="document-text" size={20} color="#fff" />
-          <Text style={styles.actionButtonText}>
-            {memo ? "Regenerate Memo" : "Generate Memo"}
-          </Text>
+          <Text style={styles.actionButtonText}>{memo ? "Regenerate Memo" : "Generate Memo"}</Text>
         </Pressable>
 
         <Pressable
@@ -195,9 +179,7 @@ export default function TopicDetailScreen() {
           disabled={generating}
         >
           <Ionicons name="help-circle" size={20} color="#fff" />
-          <Text style={styles.actionButtonText}>
-            {quizCount > 0 ? "Regenerate Quiz" : "Generate Quiz"}
-          </Text>
+          <Text style={styles.actionButtonText}>{quizCount > 0 ? "Regenerate Quiz" : "Generate Quiz"}</Text>
         </Pressable>
 
         {generating && <ActivityIndicator style={{ marginTop: 8 }} />}
@@ -232,9 +214,7 @@ export default function TopicDetailScreen() {
             <Ionicons name="help-circle" size={22} color={colors.blue} />
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={[styles.cardTitle, { color: colors.label }]}>Take Quiz</Text>
-              <Text style={[styles.cardSubtitle, { color: colors.secondaryLabel }]}>
-                {quizCount} questions
-              </Text>
+              <Text style={[styles.cardSubtitle, { color: colors.secondaryLabel }]}>{quizCount} questions</Text>
             </View>
             <Text style={[styles.drillIn, { color: colors.tertiaryLabel }]}>›</Text>
           </View>

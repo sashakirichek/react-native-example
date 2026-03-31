@@ -1,4 +1,4 @@
-import { isValidUrl, formatDate } from "../app/utils";
+import { formatDate, isValidUrl } from "../app/utils";
 
 describe("isValidUrl", () => {
   it("accepts valid http URLs", () => {

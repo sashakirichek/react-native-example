@@ -129,12 +129,7 @@ export async function updateTopicContent(
 
 // --- References ---
 
-export async function addReference(
-  db: SQLiteDatabase,
-  topicId: number,
-  url: string,
-  title?: string,
-): Promise<number> {
+export async function addReference(db: SQLiteDatabase, topicId: number, url: string, title?: string): Promise<number> {
   const result = await db.runAsync("INSERT INTO refs (topic_id, url, title) VALUES (?, ?, ?)", [
     topicId,
     url,
@@ -144,10 +139,7 @@ export async function addReference(
 }
 
 export async function getReferences(db: SQLiteDatabase, topicId: number): Promise<Reference[]> {
-  return db.getAllAsync<Reference>(
-    "SELECT * FROM refs WHERE topic_id = ? ORDER BY added_at DESC",
-    [topicId],
-  );
+  return db.getAllAsync<Reference>("SELECT * FROM refs WHERE topic_id = ? ORDER BY added_at DESC", [topicId]);
 }
 
 export async function deleteReference(db: SQLiteDatabase, id: number): Promise<void> {
@@ -163,29 +155,23 @@ export async function saveMemo(
   sourceHash: string,
 ): Promise<number> {
   await db.runAsync("DELETE FROM memos WHERE topic_id = ?", [topicId]);
-  const result = await db.runAsync(
-    "INSERT INTO memos (topic_id, content, source_hash) VALUES (?, ?, ?)",
-    [topicId, content, sourceHash],
-  );
+  const result = await db.runAsync("INSERT INTO memos (topic_id, content, source_hash) VALUES (?, ?, ?)", [
+    topicId,
+    content,
+    sourceHash,
+  ]);
   return result.lastInsertRowId;
 }
 
 export async function getMemo(db: SQLiteDatabase, topicId: number): Promise<Memo | null> {
-  return db.getFirstAsync<Memo>(
-    "SELECT * FROM memos WHERE topic_id = ? ORDER BY generated_at DESC LIMIT 1",
-    [topicId],
-  );
+  return db.getFirstAsync<Memo>("SELECT * FROM memos WHERE topic_id = ? ORDER BY generated_at DESC LIMIT 1", [topicId]);
 }
 
-export async function updateMemo(
-  db: SQLiteDatabase,
-  memoId: number,
-  content: string,
-): Promise<void> {
-  await db.runAsync(
-    "UPDATE memos SET content = ?, edited_at = datetime('now'), is_edited = 1 WHERE id = ?",
-    [content, memoId],
-  );
+export async function updateMemo(db: SQLiteDatabase, memoId: number, content: string): Promise<void> {
+  await db.runAsync("UPDATE memos SET content = ?, edited_at = datetime('now'), is_edited = 1 WHERE id = ?", [
+    content,
+    memoId,
+  ]);
 }
 
 // --- Quiz Questions ---
@@ -201,10 +187,9 @@ export async function saveQuizQuestions(
   }[],
 ): Promise<void> {
   await db.withTransactionAsync(async () => {
-    const existingIds = await db.getAllAsync<{ id: number }>(
-      "SELECT id FROM quiz_questions WHERE topic_id = ?",
-      [topicId],
-    );
+    const existingIds = await db.getAllAsync<{ id: number }>("SELECT id FROM quiz_questions WHERE topic_id = ?", [
+      topicId,
+    ]);
     for (const { id } of existingIds) {
       await db.runAsync("DELETE FROM quiz_options WHERE question_id = ?", [id]);
     }
@@ -217,10 +202,11 @@ export async function saveQuizQuestions(
       );
       const questionId = result.lastInsertRowId;
       for (const opt of q.options) {
-        await db.runAsync(
-          "INSERT INTO quiz_options (question_id, option_text, is_correct) VALUES (?, ?, ?)",
-          [questionId, opt.text, opt.isCorrect ? 1 : 0],
-        );
+        await db.runAsync("INSERT INTO quiz_options (question_id, option_text, is_correct) VALUES (?, ?, ?)", [
+          questionId,
+          opt.text,
+          opt.isCorrect ? 1 : 0,
+        ]);
       }
     }
   });
@@ -230,16 +216,14 @@ export async function getQuizQuestions(
   db: SQLiteDatabase,
   topicId: number,
 ): Promise<(QuizQuestion & { options: QuizOption[] })[]> {
-  const questions = await db.getAllAsync<QuizQuestion>(
-    "SELECT * FROM quiz_questions WHERE topic_id = ? ORDER BY id",
-    [topicId],
-  );
+  const questions = await db.getAllAsync<QuizQuestion>("SELECT * FROM quiz_questions WHERE topic_id = ? ORDER BY id", [
+    topicId,
+  ]);
   const result: (QuizQuestion & { options: QuizOption[] })[] = [];
   for (const q of questions) {
-    const options = await db.getAllAsync<QuizOption>(
-      "SELECT * FROM quiz_options WHERE question_id = ? ORDER BY id",
-      [q.id],
-    );
+    const options = await db.getAllAsync<QuizOption>("SELECT * FROM quiz_options WHERE question_id = ? ORDER BY id", [
+      q.id,
+    ]);
     result.push({ ...q, options });
   }
   return result;
@@ -253,19 +237,16 @@ export async function saveQuizAttempt(
   score: number,
   total: number,
 ): Promise<number> {
-  const result = await db.runAsync(
-    "INSERT INTO quiz_attempts (topic_id, score, total) VALUES (?, ?, ?)",
-    [topicId, score, total],
-  );
+  const result = await db.runAsync("INSERT INTO quiz_attempts (topic_id, score, total) VALUES (?, ?, ?)", [
+    topicId,
+    score,
+    total,
+  ]);
   return result.lastInsertRowId;
 }
 
-export async function getQuizAttempts(
-  db: SQLiteDatabase,
-  topicId: number,
-): Promise<QuizAttempt[]> {
-  return db.getAllAsync<QuizAttempt>(
-    "SELECT * FROM quiz_attempts WHERE topic_id = ? ORDER BY completed_at DESC",
-    [topicId],
-  );
+export async function getQuizAttempts(db: SQLiteDatabase, topicId: number): Promise<QuizAttempt[]> {
+  return db.getAllAsync<QuizAttempt>("SELECT * FROM quiz_attempts WHERE topic_id = ? ORDER BY completed_at DESC", [
+    topicId,
+  ]);
 }

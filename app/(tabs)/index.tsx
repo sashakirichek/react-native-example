@@ -31,9 +31,7 @@ export default function LibraryScreen() {
   const swipeableRefs = useRef<Map<number, Swipeable | null>>(new Map());
 
   const loadTopics = useCallback(async () => {
-    const results = searchQuery.trim()
-      ? await searchTopics(db, searchQuery.trim())
-      : await listTopics(db);
+    const results = searchQuery.trim() ? await searchTopics(db, searchQuery.trim()) : await listTopics(db);
     setTopics(results);
   }, [db, searchQuery]);
 
@@ -97,47 +95,49 @@ export default function LibraryScreen() {
 
   const renderItem = ({ item }: { item: TopicWithMeta }) => (
     <Swipeable
-      ref={(ref) => { swipeableRefs.current.set(item.id, ref); }}
+      ref={(ref) => {
+        swipeableRefs.current.set(item.id, ref);
+      }}
       renderRightActions={renderRightActions}
       onSwipeableOpen={() => handleDelete(item)}
       overshootRight={false}
     >
-    <Pressable
-      style={[styles.card, isDark && styles.cardDark]}
-      onPress={() => router.push(`/topic/${item.id}` as any)}
-    >
-      <View style={styles.cardHeader}>
-        <Ionicons
-          name={sourceIcon(item.source_type) as any}
-          size={18}
-          color={colors.blue}
-          style={styles.sourceIcon}
-        />
-        <Text style={[styles.cardTitle, { color: colors.label }]} numberOfLines={1}>
-          {item.name}
+      <Pressable
+        style={[styles.card, isDark && styles.cardDark]}
+        onPress={() => router.push(`/topic/${item.id}` as any)}
+      >
+        <View style={styles.cardHeader}>
+          <Ionicons
+            name={sourceIcon(item.source_type) as any}
+            size={18}
+            color={colors.blue}
+            style={styles.sourceIcon}
+          />
+          <Text style={[styles.cardTitle, { color: colors.label }]} numberOfLines={1}>
+            {item.name}
+          </Text>
+        </View>
+        <View style={styles.badges}>
+          {item.has_memo ? (
+            <View style={[styles.badge, styles.badgeMemo]}>
+              <Text style={styles.badgeText}>Memo</Text>
+            </View>
+          ) : null}
+          {item.quiz_count > 0 ? (
+            <View style={[styles.badge, styles.badgeQuiz]}>
+              <Text style={styles.badgeText}>Quiz ({item.quiz_count})</Text>
+            </View>
+          ) : null}
+          {item.last_attempt_score != null ? (
+            <View style={[styles.badge, styles.badgeScore]}>
+              <Text style={styles.badgeText}>Score: {item.last_attempt_score}%</Text>
+            </View>
+          ) : null}
+        </View>
+        <Text style={[styles.cardDate, { color: colors.secondaryLabel }]}>
+          {new Date(item.created_at).toLocaleDateString()}
         </Text>
-      </View>
-      <View style={styles.badges}>
-        {item.has_memo ? (
-          <View style={[styles.badge, styles.badgeMemo]}>
-            <Text style={styles.badgeText}>Memo</Text>
-          </View>
-        ) : null}
-        {item.quiz_count > 0 ? (
-          <View style={[styles.badge, styles.badgeQuiz]}>
-            <Text style={styles.badgeText}>Quiz ({item.quiz_count})</Text>
-          </View>
-        ) : null}
-        {item.last_attempt_score != null ? (
-          <View style={[styles.badge, styles.badgeScore]}>
-            <Text style={styles.badgeText}>Score: {item.last_attempt_score}%</Text>
-          </View>
-        ) : null}
-      </View>
-      <Text style={[styles.cardDate, { color: colors.secondaryLabel }]}>
-        {new Date(item.created_at).toLocaleDateString()}
-      </Text>
-    </Pressable>
+      </Pressable>
     </Swipeable>
   );
 
@@ -168,9 +168,7 @@ export default function LibraryScreen() {
           <View style={styles.empty}>
             <Ionicons name="library-outline" size={64} color={colors.gray3} />
             <Text style={[styles.emptyText, { color: colors.secondaryLabel }]}>No topics yet</Text>
-            <Text style={[styles.emptySubtext, { color: colors.tertiaryLabel }]}>
-              Tap "New Topic" to get started
-            </Text>
+            <Text style={[styles.emptySubtext, { color: colors.tertiaryLabel }]}>Tap "New Topic" to get started</Text>
           </View>
         }
         contentContainerStyle={topics.length === 0 ? styles.emptyList : undefined}

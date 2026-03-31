@@ -1,18 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  View,
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from "react-native";
 import { getMemo, getTopic, updateMemo, type Memo, type Topic } from "../db/repository";
 import { getColors, iOS18Components, iOS18Typography } from "../theme/ios18";
 
@@ -40,9 +31,7 @@ export default function MemoScreen() {
   if (!memo) {
     return (
       <View style={[styles.center, { backgroundColor: colors.systemGroupedBackground }]}>
-        <Text style={[styles.emptyText, { color: colors.secondaryLabel }]}>
-          No memo generated yet.
-        </Text>
+        <Text style={[styles.emptyText, { color: colors.secondaryLabel }]}>No memo generated yet.</Text>
       </View>
     );
   }
@@ -72,9 +61,7 @@ export default function MemoScreen() {
       contentContainerStyle={styles.content}
     >
       <View style={styles.headerRow}>
-        <Text style={[styles.title, { color: colors.label }]}>
-          {topic?.name || "Memo"}
-        </Text>
+        <Text style={[styles.title, { color: colors.label }]}>{topic?.name || "Memo"}</Text>
         {!editing && (
           <Pressable onPress={handleEdit} style={styles.editButton}>
             <Ionicons name="pencil" size={18} color={colors.blue} />
@@ -135,9 +122,7 @@ export default function MemoScreen() {
                 return (
                   <Text key={i} style={[styles.bulletText, { color: colors.secondaryLabel }]}>
                     {"  • "}
-                    <Text style={{ fontWeight: "700", color: colors.label }}>
-                      {match[1]}
-                    </Text>
+                    <Text style={{ fontWeight: "700", color: colors.label }}>{match[1]}</Text>
                     {match[2] ? `: ${match[2]}` : ""}
                   </Text>
                 );

@@ -1,4 +1,4 @@
-import { extractSentences, extractKeyTerms, contentHash } from "./text-processing";
+import { contentHash, extractKeyTerms, extractSentences } from "./text-processing";
 
 export type GeneratedQuestion = {
   questionText: string;
@@ -47,19 +47,14 @@ function generateClozeQuestions(
     used.add(i);
     const blank = sentence.replace(new RegExp(`\\b${escapeRegex(target)}\\b`, "i"), "______");
 
-    const distractors = keyTerms
-      .filter((t) => t.toLowerCase() !== target.toLowerCase())
-      .slice(0, 3);
+    const distractors = keyTerms.filter((t) => t.toLowerCase() !== target.toLowerCase()).slice(0, 3);
     if (distractors.length < 2) continue;
 
     questions.push({
       questionText: `Fill in the blank: ${blank}`,
       questionType: "cloze",
       sourceHash: hash,
-      options: shuffle([
-        { text: target, isCorrect: true },
-        ...distractors.map((d) => ({ text: d, isCorrect: false })),
-      ]),
+      options: shuffle([{ text: target, isCorrect: true }, ...distractors.map((d) => ({ text: d, isCorrect: false }))]),
     });
   }
   return questions;
@@ -95,10 +90,7 @@ function generateTrueFalseQuestions(
       const target = findClozeTarget(sentence, keyTerms);
       const replacement = keyTerms.find((t) => t.toLowerCase() !== target?.toLowerCase());
       if (target && replacement) {
-        const falseSentence = sentence.replace(
-          new RegExp(`\\b${escapeRegex(target)}\\b`, "i"),
-          replacement,
-        );
+        const falseSentence = sentence.replace(new RegExp(`\\b${escapeRegex(target)}\\b`, "i"), replacement);
         questions.push({
           questionText: `True or False: "${falseSentence}"`,
           questionType: "true_false",
@@ -125,27 +117,19 @@ function generateMCQQuestions(
 
   for (let i = 0; i < keyTerms.length && questions.length < max; i++) {
     const term = keyTerms[i];
-    const contextSentence = sentences.find((s) =>
-      new RegExp(`\\b${escapeRegex(term)}\\b`, "i").test(s),
-    );
+    const contextSentence = sentences.find((s) => new RegExp(`\\b${escapeRegex(term)}\\b`, "i").test(s));
     if (!contextSentence) continue;
 
     const distractors = keyTerms.filter((t) => t !== term).slice(0, 3);
     if (distractors.length < 2) continue;
 
-    const blank = contextSentence.replace(
-      new RegExp(`\\b${escapeRegex(term)}\\b`, "i"),
-      "______",
-    );
+    const blank = contextSentence.replace(new RegExp(`\\b${escapeRegex(term)}\\b`, "i"), "______");
 
     questions.push({
       questionText: `In the context of "${topicName}", which term best fits: "${blank}"?`,
       questionType: "mcq",
       sourceHash: hash,
-      options: shuffle([
-        { text: term, isCorrect: true },
-        ...distractors.map((d) => ({ text: d, isCorrect: false })),
-      ]),
+      options: shuffle([{ text: term, isCorrect: true }, ...distractors.map((d) => ({ text: d, isCorrect: false }))]),
     });
   }
   return questions;
@@ -155,11 +139,7 @@ function generateMCQQuestions(
  * Generate quiz questions from topic content using heuristics.
  * Works on all iOS versions — no AI model required.
  */
-export function generateQuizQuestions(
-  topicName: string,
-  content: string,
-  maxQuestions = 10,
-): GeneratedQuestion[] {
+export function generateQuizQuestions(topicName: string, content: string, maxQuestions = 10): GeneratedQuestion[] {
   if (!content || content.trim().length < 50) return [];
 
   const sentences = extractSentences(content);

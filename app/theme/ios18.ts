@@ -118,11 +118,9 @@ export const iOS18Components = {
   /** Standard horizontal padding */
   horizontalPadding: 16,
   /** Tab bar active tint */
-  tabBarActiveTint: (isDark: boolean) =>
-    isDark ? iOS18Colors.dark.blue : iOS18Colors.light.blue,
+  tabBarActiveTint: (isDark: boolean) => (isDark ? iOS18Colors.dark.blue : iOS18Colors.light.blue),
   /** Tab bar inactive tint */
-  tabBarInactiveTint: (isDark: boolean) =>
-    isDark ? iOS18Colors.dark.gray : iOS18Colors.light.gray,
+  tabBarInactiveTint: (isDark: boolean) => (isDark ? iOS18Colors.dark.gray : iOS18Colors.light.gray),
 } as const;
 
 /** Helper to get the full color set for current appearance */

@@ -1,3 +1,4 @@
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useState } from "react";
@@ -11,11 +12,9 @@ import {
   Text,
   TextInput,
   useColorScheme,
-  View,
 } from "react-native";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import { createTopic, addReference } from "../db/repository";
-import { stripHtml, normalizeText } from "../lib/text-processing";
+import { addReference, createTopic } from "../db/repository";
+import { normalizeText, stripHtml } from "../lib/text-processing";
 import { getColors, iOS18Components, iOS18Typography } from "../theme/ios18";
 
 type SourceMode = "name" | "text" | "url";
@@ -105,10 +104,7 @@ export default function CreateScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView
         style={[styles.container, { backgroundColor: colors.systemGroupedBackground }]}
         contentContainerStyle={styles.content}
@@ -168,9 +164,7 @@ export default function CreateScreen() {
           onPress={handleCreate}
           disabled={!isValid() || loading}
         >
-          <Text style={styles.createButtonText}>
-            {loading ? "Creating…" : "Create Topic"}
-          </Text>
+          <Text style={styles.createButtonText}>{loading ? "Creating…" : "Create Topic"}</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>

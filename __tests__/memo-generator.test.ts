@@ -43,10 +43,7 @@ describe("generateMemo", () => {
   });
 
   it("includes references when provided", () => {
-    const result = generateMemo("Test", SAMPLE_CONTENT, [
-      "https://reactnative.dev",
-      "https://expo.dev",
-    ]);
+    const result = generateMemo("Test", SAMPLE_CONTENT, ["https://reactnative.dev", "https://expo.dev"]);
     expect(result.content).toContain("📚 References");
     expect(result.content).toContain("https://reactnative.dev");
     expect(result.content).toContain("https://expo.dev");

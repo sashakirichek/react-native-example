@@ -1,22 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import {
-  getQuizQuestions,
-  saveQuizAttempt,
-  type QuizOption,
-  type QuizQuestion,
-} from "../db/repository";
+import { Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from "react-native";
+import { getQuizQuestions, saveQuizAttempt, type QuizOption, type QuizQuestion } from "../db/repository";
 import { getColors, iOS18Components, iOS18Typography } from "../theme/ios18";
 
 type QuestionWithOptions = QuizQuestion & { options: QuizOption[] };
@@ -52,9 +40,7 @@ export default function QuizScreen() {
   if (questions.length === 0) {
     return (
       <View style={[styles.center, { backgroundColor: colors.systemGroupedBackground }]}>
-        <Text style={[styles.emptyText, { color: colors.secondaryLabel }]}>
-          No quiz questions available.
-        </Text>
+        <Text style={[styles.emptyText, { color: colors.secondaryLabel }]}>No quiz questions available.</Text>
       </View>
     );
   }
@@ -63,11 +49,7 @@ export default function QuizScreen() {
     const pct = Math.round((score / questions.length) * 100);
     return (
       <View style={[styles.center, { backgroundColor: colors.systemGroupedBackground }]}>
-        <Ionicons
-          name={pct >= 70 ? "trophy" : "ribbon"}
-          size={64}
-          color={pct >= 70 ? colors.yellow : colors.gray}
-        />
+        <Ionicons name={pct >= 70 ? "trophy" : "ribbon"} size={64} color={pct >= 70 ? colors.yellow : colors.gray} />
         <Text style={[styles.scoreTitle, { color: colors.label }]}>Quiz Complete!</Text>
         <Text style={[styles.scoreText, { color: colors.blue }]}>
           {score} / {questions.length} ({pct}%)
@@ -110,8 +92,7 @@ export default function QuizScreen() {
   const handleNext = async () => {
     if (currentIndex === questions.length - 1) {
       const finalScore =
-        score +
-        (current.options.find((o) => o.id === selectedOptionId)?.is_correct && !revealed ? 1 : 0);
+        score + (current.options.find((o) => o.id === selectedOptionId)?.is_correct && !revealed ? 1 : 0);
       await saveQuizAttempt(db, Number(topicId), score, questions.length);
       setFinished(true);
     } else {
@@ -140,9 +121,7 @@ export default function QuizScreen() {
       <Text style={[styles.progress, { color: colors.secondaryLabel }]}>
         Question {currentIndex + 1} of {questions.length}
       </Text>
-      <Text style={[styles.questionText, { color: colors.label }]}>
-        {current.question_text}
-      </Text>
+      <Text style={[styles.questionText, { color: colors.label }]}>{current.question_text}</Text>
 
       <View style={styles.options}>
         {current.options.map((option) => (
@@ -175,9 +154,7 @@ export default function QuizScreen() {
         </Pressable>
       ) : (
         <Pressable style={[styles.primaryButton, { backgroundColor: colors.blue }]} onPress={handleNext}>
-          <Text style={styles.primaryButtonText}>
-            {currentIndex === questions.length - 1 ? "Finish" : "Next"}
-          </Text>
+          <Text style={styles.primaryButtonText}>{currentIndex === questions.length - 1 ? "Finish" : "Next"}</Text>
         </Pressable>
       )}
     </ScrollView>

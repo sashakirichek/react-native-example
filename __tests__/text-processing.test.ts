@@ -1,10 +1,10 @@
 import {
-  normalizeText,
-  extractSentences,
-  extractKeyTerms,
   contentHash,
-  stripHtml,
+  extractKeyTerms,
+  extractSentences,
   getExcerpt,
+  normalizeText,
+  stripHtml,
 } from "../app/lib/text-processing";
 
 describe("normalizeText", () => {
@@ -23,8 +23,7 @@ describe("normalizeText", () => {
 
 describe("extractSentences", () => {
   it("splits text on sentence boundaries", () => {
-    const text =
-      "React Native is a framework. It lets you build mobile apps. You can use JavaScript for this purpose.";
+    const text = "React Native is a framework. It lets you build mobile apps. You can use JavaScript for this purpose.";
     const sentences = extractSentences(text);
     expect(sentences.length).toBe(3);
     expect(sentences[0]).toBe("React Native is a framework.");
@@ -83,8 +82,7 @@ describe("stripHtml", () => {
   });
 
   it("removes script and style blocks", () => {
-    const html =
-      '<div>Content</div><script>alert("x")</script><style>.a{color:red}</style><p>More</p>';
+    const html = '<div>Content</div><script>alert("x")</script><style>.a{color:red}</style><p>More</p>';
     expect(stripHtml(html)).toBe("Content More");
   });
 
