@@ -1,5 +1,5 @@
 {
-  "name": "react-native-example",
+  "name": "knowledge-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "test": "jest",
     "audit:fix": "npm audit fix"
   },
   "dependencies": {
@@ -53,10 +54,12 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.0",
     "@types/lodash.debounce": "^4.0.9",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "jest-expo": "~54.0.0",
     "typescript": "~5.9.2"
   },
   "private": true

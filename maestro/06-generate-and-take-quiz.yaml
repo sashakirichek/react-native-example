@@ -1,0 +1,16 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 6: Generate and take a quiz
+- launchApp
+- tapOn: "New Topic"
+- tapOn: "Paste Text"
+- tapOn: "Topic Name"
+- inputText: "Data Structures"
+- tapOn: "Content"
+- inputText: "Arrays store elements in contiguous memory locations. Linked lists consist of nodes with pointers. Hash tables provide constant time lookups. Binary trees organize data hierarchically. Stacks follow last-in-first-out ordering. Queues follow first-in-first-out ordering. Graphs represent connections between nodes."
+- tapOn: "Create Topic"
+- assertVisible: "Data Structures"
+- tapOn: "Generate Quiz"
+- assertVisible: "Take Quiz"
+- tapOn: "Take Quiz"
+- assertVisible: "Question 1"

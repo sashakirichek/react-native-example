@@ -1,0 +1,12 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 2: Create topic by pasting text
+- launchApp
+- tapOn: "New Topic"
+- tapOn: "Paste Text"
+- tapOn: "Topic Name"
+- inputText: "JavaScript Closures"
+- tapOn: "Content"
+- inputText: "A closure is a function that retains access to variables from its enclosing scope. Closures are fundamental to JavaScript and enable patterns like data privacy and function factories. They are created every time a function is created."
+- tapOn: "Create Topic"
+- assertVisible: "JavaScript Closures"

@@ -1,0 +1,16 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 5: Generate memo from text topic
+- launchApp
+- tapOn: "New Topic"
+- tapOn: "Paste Text"
+- tapOn: "Topic Name"
+- inputText: "Design Patterns"
+- tapOn: "Content"
+- inputText: "Design patterns are reusable solutions to common software problems. The Singleton pattern ensures a class has one instance. The Observer pattern defines a subscription mechanism. The Factory pattern creates objects without specifying exact classes. The Strategy pattern enables selecting algorithms at runtime."
+- tapOn: "Create Topic"
+- assertVisible: "Design Patterns"
+- tapOn: "Generate Memo"
+- assertVisible: "View Memo"
+- tapOn: "View Memo"
+- assertVisible: "Discover"

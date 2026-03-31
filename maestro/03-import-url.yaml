@@ -1,0 +1,12 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 3: Import topic from URL
+- launchApp
+- tapOn: "New Topic"
+- tapOn: "Import URL"
+- tapOn: "Topic Name"
+- inputText: "Expo Documentation"
+- tapOn: "URL"
+- inputText: "https://docs.expo.dev/get-started/introduction/"
+- tapOn: "Create Topic"
+- assertVisible: "Expo Documentation"

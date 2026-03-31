@@ -1,15 +1,18 @@
 {
   "expo": {
-    "name": "react-native-example",
-    "slug": "react-native-example",
+    "name": "Knowledge",
+    "slug": "knowledge-app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
-    "scheme": "react-native-example",
+    "scheme": "knowledge-app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "MinimumOSVersion": "18.0"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,19 +29,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-sqlite",
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
-        }
-      ],
-      [
-        "expo-document-picker",
-        {
-          "iCloudContainerEnvironment": "Production"
-        }
-      ]
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

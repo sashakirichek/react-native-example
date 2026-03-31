@@ -1,0 +1,15 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 7: Search topics in library
+- launchApp
+# First create a topic
+- tapOn: "New Topic"
+- tapOn: "Topic Name"
+- inputText: "Unique Search Target Alpha"
+- tapOn: "Create Topic"
+# Go back to library
+- tapOn: "Library"
+# Search for it
+- tapOn: "Search topics…"
+- inputText: "Alpha"
+- assertVisible: "Unique Search Target Alpha"

@@ -1,0 +1,13 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 4: Library persists after relaunch
+- launchApp
+- tapOn: "New Topic"
+- tapOn: "Topic Name"
+- inputText: "Persistence Test Topic"
+- tapOn: "Create Topic"
+- assertVisible: "Persistence Test Topic"
+- pressKey: home
+- launchApp
+- tapOn: "Library"
+- assertVisible: "Persistence Test Topic"

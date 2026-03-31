@@ -1,8 +1,41 @@
-# Welcome to your Expo app 👋
+# Knowledge App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An offline-first iOS/iPadOS knowledge storage system built with [Expo](https://expo.dev) and React Native. Store topics, generate structured memos, and test yourself with auto-generated quizzes — all on-device.
 
-## Get started
+## Features
+
+- **Topic Import** — Create topics by name, pasting text, or importing a URL (fetches a readable snapshot)
+- **Double Diamond Memos** — Generate structured study memos following the Discover → Define → Develop → Deliver framework
+- **Quiz Generation** — Auto-generate MCQ, cloze, and true/false questions from your topic content
+- **Swipe to Delete** — Remove topics from the library with a swipe gesture
+- **Dark Mode** — Full light/dark theme support
+- **iPad Support** — Responsive layout for both iPhone and iPad
+- **Offline Storage** — All data stored locally in SQLite
+
+## Generation Approach
+
+### iOS/iPadOS 18+ — Deterministic Heuristic Engine
+
+On iOS 18 and later, memo and quiz generation runs entirely in JavaScript with no AI model dependency:
+
+- **Quiz generation**: Sentence extraction, key-term frequency analysis, cloze (fill-in-the-blank) construction, true/false variants with term-swapping distractors, and multiple-choice questions built from contextual term matching
+- **Memo generation**: Automated Double Diamond structuring — key concept extraction (Discover), definition sentence selection (Define), supporting point enumeration (Develop), and term-contextualized takeaways (Deliver)
+- **Change detection**: Content hashing tracks source changes so you can regenerate after edits without losing the original
+
+This deterministic approach works offline, produces consistent results, and requires no network or model downloads.
+
+### iOS/iPadOS 26+ — Apple Foundation Models (Future Enhancement)
+
+On iOS 26 and later (with Apple Intelligence enabled), the app can optionally use Apple's on-device Foundation Models for higher-quality generation:
+
+- **Richer memos**: Natural language summaries, better paragraph flow, contextual cross-referencing
+- **Smarter quizzes**: Conceptual questions beyond keyword extraction, better distractor quality
+- **Runtime gated**: The app checks for Apple Intelligence availability at runtime — if unavailable, it falls back to the deterministic engine seamlessly
+- **No cloud dependency**: Apple Foundation Models run on-device via the Neural Engine
+
+This enhancement is non-blocking — the app ships fully functional on iOS 18+ using the deterministic engine alone.
+
+## Get Started
 
 1. Install dependencies
 
@@ -10,49 +43,55 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Start the app in Expo Go
 
    ```bash
    npx expo start
    ```
 
-To run EAS on device:
+3. Run unit tests
+
+   ```bash
+   npm test
+   ```
+
+## Build for Device
+
+The project uses an unsigned IPA workflow for sideloading via AltStore:
+
+```bash
+# Triggered via GitHub Actions (.github/workflows/build-ipa.yml)
+# Produces an unsigned .ipa artifact for AltStore sideloading
+```
+
+EAS CLI (optional for future cloud builds):
 
 ```
 npm install -g eas-cli
-
-
 ```
 
-In the output, you'll find options to open the app in a
+## Project Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/
+  (tabs)/          — Tab navigation (Library, Create, Settings)
+  topic/[id].tsx   — Topic detail + generation triggers
+  quiz/[topicId].tsx — Interactive quiz with scoring
+  memo/[topicId].tsx — Memo viewer with edit support
+  db/              — SQLite schema + repository layer
+  lib/             — Text processing, quiz & memo generators
+__tests__/         — Unit tests for generators and utilities
+maestro/           — E2E test scenarios (7 flows)
+docs/              — Server-side AI roadmap
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Server-Side AI Roadmap
 
-## Learn more
+See [docs/server-ai-roadmap.md](docs/server-ai-roadmap.md) for the future backend architecture: Node.js + Mac mini inference host + Cloudflare edge entry.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Learn More
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Expo documentation](https://docs.expo.dev/)
+- [Expo Router](https://docs.expo.dev/router/introduction/)
+- [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/)
+- [Apple Foundation Models](https://developer.apple.com/documentation/foundationmodels)

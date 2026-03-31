@@ -1,0 +1,10 @@
+appId: com.sashakirichek.reactnativeexample
+---
+# Scenario 1: Create topic by name
+- launchApp
+- tapOn: "New Topic"
+- tapOn: "Topic Name"
+- tapOn: "Topic Name"
+- inputText: "React Native Navigation"
+- tapOn: "Create Topic"
+- assertVisible: "React Native Navigation"
