@@ -1,4 +1,5 @@
 import { useNavigation, useTheme } from "@react-navigation/native";
+import * as DocumentPicker from "expo-document-picker";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput } from "react-native";
@@ -17,6 +18,8 @@ export default function MenuList() {
   const { query, handleSearchChange } = useSearchFilter();
   const theme = useTheme();
   const commonStyles = createCommonStyles(theme);
+  const [selectedDocuments, setSelectedDocuments] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
+
   useEffect(() => {
     if (!isMounted.current) return;
 
@@ -28,6 +31,30 @@ export default function MenuList() {
       setFilteredCustomers(customerNames);
     })();
   }, []);
+
+  const pickDocuments = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        multiple: true, // Allows the user to select any file
+        type: ["application/pdf"],
+      });
+
+      if (!result.canceled) {
+        const successResult = result as DocumentPicker.DocumentPickerSuccessResult;
+
+        // To limit the amount of documents that is added to the array "selectedDocuments"
+        if (selectedDocuments.length + successResult.assets.length <= 5) {
+          setSelectedDocuments((prevSelectedDocuments) => [...prevSelectedDocuments, ...successResult.assets]);
+        } else {
+          console.log("Maximum of 1 document allowed.");
+        }
+      } else {
+        console.log("Document selection cancelled.");
+      }
+    } catch (error) {
+      console.log("Error picking documents:", error);
+    }
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -77,6 +104,23 @@ export default function MenuList() {
             {mi}
           </Text>
         ))}
+        <Text style={commonStyles.header}>PDF parsing</Text>
+        <Pressable
+          style={commonStyles.pressable}
+          onPress={async () => {
+            console.log(pickDocuments);
+            await pickDocuments();
+          }}
+        >
+          <Text style={commonStyles.pressableText}>Pick pdf's</Text>
+        </Pressable>
+        <Text style={commonStyles.pressableText}>
+          Selected docs: {selectedDocuments.length} {selectedDocuments.map((d) => d.name).join(", ")}
+        </Text>
+        <Text style={commonStyles.text}>File metadata: </Text>
+        <ScrollView style={commonStyles.text}>
+          <Text style={commonStyles.text}>{JSON.stringify(selectedDocuments, null, 4)}</Text>
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
