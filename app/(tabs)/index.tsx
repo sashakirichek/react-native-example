@@ -134,6 +134,15 @@ export default function LibraryScreen() {
             </View>
           ) : null}
         </View>
+        {item.category_names ? (
+          <View style={styles.categoryRow}>
+            {item.category_names.split(",").map((name) => (
+              <View key={name} style={[styles.categoryChip, { backgroundColor: colors.tertiaryFill }]}>
+                <Text style={[styles.categoryChipText, { color: colors.secondaryLabel }]}>{name}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
         <Text style={[styles.cardDate, { color: colors.secondaryLabel }]}>
           {new Date(item.created_at).toLocaleDateString()}
         </Text>
@@ -204,11 +213,14 @@ const styles = StyleSheet.create({
   cardTitle: { ...iOS18Typography.headline, flex: 1 },
   badges: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 6 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
-  badgeMemo: { backgroundColor: "rgba(52,199,89,0.15)" },
-  badgeQuiz: { backgroundColor: "rgba(0,122,255,0.12)" },
-  badgeScore: { backgroundColor: "rgba(255,149,0,0.15)" },
-  badgeText: { ...iOS18Typography.caption1, fontWeight: "500", color: "#333" },
+  badgeMemo: { backgroundColor: "rgba(52, 199, 89, 0.44)" },
+  badgeQuiz: { backgroundColor: "rgba(0, 123, 255, 0.55)" },
+  badgeScore: { backgroundColor: "rgba(255, 149, 0, 0.44)" },
+  badgeText: { ...iOS18Typography.caption1, fontWeight: "500", color: "#ffffff" },
   cardDate: { ...iOS18Typography.caption1 },
+  categoryRow: { flexDirection: "row", flexWrap: "wrap", gap: 4, marginBottom: 4 },
+  categoryChip: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
+  categoryChipText: { ...iOS18Typography.caption2, fontWeight: "500" },
   deleteAction: {
     backgroundColor: "#FF3B30",
     justifyContent: "center",

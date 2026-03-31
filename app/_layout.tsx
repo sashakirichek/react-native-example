@@ -68,6 +68,18 @@ async function initDatabase(db: import("expo-sqlite").SQLiteDatabase) {
       completed_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS topic_categories (
+      topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
+      category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+      PRIMARY KEY (topic_id, category_id)
+    );
+
     PRAGMA foreign_keys = ON;
   `);
 }

@@ -17,6 +17,13 @@ export type TopicWithMeta = Topic & {
   has_memo: number;
   quiz_count: number;
   last_attempt_score: number | null;
+  category_names: string | null;
+};
+
+export type Category = {
+  id: number;
+  name: string;
+  created_at: string;
 };
 
 export type Memo = {
@@ -89,7 +96,10 @@ export async function listTopics(db: SQLiteDatabase): Promise<TopicWithMeta[]> {
       (SELECT COUNT(*) FROM quiz_questions WHERE topic_id = t.id) as quiz_count,
       (SELECT CAST(score * 100.0 / total AS INTEGER)
        FROM quiz_attempts WHERE topic_id = t.id
-       ORDER BY completed_at DESC LIMIT 1) as last_attempt_score
+       ORDER BY completed_at DESC LIMIT 1) as last_attempt_score,
+      (SELECT GROUP_CONCAT(c.name, ',')
+       FROM categories c JOIN topic_categories tc ON c.id = tc.category_id
+       WHERE tc.topic_id = t.id) as category_names
     FROM topics t
     ORDER BY t.updated_at DESC
   `);
@@ -103,7 +113,10 @@ export async function searchTopics(db: SQLiteDatabase, query: string): Promise<T
       (SELECT COUNT(*) FROM quiz_questions WHERE topic_id = t.id) as quiz_count,
       (SELECT CAST(score * 100.0 / total AS INTEGER)
        FROM quiz_attempts WHERE topic_id = t.id
-       ORDER BY completed_at DESC LIMIT 1) as last_attempt_score
+       ORDER BY completed_at DESC LIMIT 1) as last_attempt_score,
+      (SELECT GROUP_CONCAT(c.name, ',')
+       FROM categories c JOIN topic_categories tc ON c.id = tc.category_id
+       WHERE tc.topic_id = t.id) as category_names
     FROM topics t
     WHERE t.name LIKE ? OR t.raw_text LIKE ? OR t.source_snapshot LIKE ?
     ORDER BY t.updated_at DESC`,
@@ -249,4 +262,81 @@ export async function getQuizAttempts(db: SQLiteDatabase, topicId: number): Prom
   return db.getAllAsync<QuizAttempt>("SELECT * FROM quiz_attempts WHERE topic_id = ? ORDER BY completed_at DESC", [
     topicId,
   ]);
+}
+
+// --- Categories ---
+
+export async function createCategory(db: SQLiteDatabase, name: string): Promise<number> {
+  const result = await db.runAsync("INSERT INTO categories (name) VALUES (?)", [name]);
+  return result.lastInsertRowId;
+}
+
+export async function listCategories(db: SQLiteDatabase): Promise<Category[]> {
+  return db.getAllAsync<Category>("SELECT * FROM categories ORDER BY name");
+}
+
+export async function deleteCategory(db: SQLiteDatabase, id: number): Promise<void> {
+  await db.runAsync("DELETE FROM categories WHERE id = ?", [id]);
+}
+
+// --- Topic ↔ Category ---
+
+export async function setTopicCategories(
+  db: SQLiteDatabase,
+  topicId: number,
+  categoryIds: number[],
+): Promise<void> {
+  await db.runAsync("DELETE FROM topic_categories WHERE topic_id = ?", [topicId]);
+  for (const catId of categoryIds) {
+    await db.runAsync("INSERT INTO topic_categories (topic_id, category_id) VALUES (?, ?)", [topicId, catId]);
+  }
+}
+
+export async function getTopicCategories(db: SQLiteDatabase, topicId: number): Promise<Category[]> {
+  return db.getAllAsync<Category>(
+    "SELECT c.* FROM categories c JOIN topic_categories tc ON c.id = tc.category_id WHERE tc.topic_id = ? ORDER BY c.name",
+    [topicId],
+  );
+}
+
+// --- Multi-topic Quiz Queries ---
+
+export async function getQuizQuestionsByCategories(
+  db: SQLiteDatabase,
+  categoryIds: number[],
+): Promise<(QuizQuestion & { options: QuizOption[] })[]> {
+  const placeholders = categoryIds.map(() => "?").join(",");
+  const questions = await db.getAllAsync<QuizQuestion>(
+    `SELECT DISTINCT qq.* FROM quiz_questions qq
+     JOIN topic_categories tc ON qq.topic_id = tc.topic_id
+     WHERE tc.category_id IN (${placeholders})
+     ORDER BY qq.id`,
+    categoryIds,
+  );
+  const result: (QuizQuestion & { options: QuizOption[] })[] = [];
+  for (const q of questions) {
+    const options = await db.getAllAsync<QuizOption>("SELECT * FROM quiz_options WHERE question_id = ? ORDER BY id", [
+      q.id,
+    ]);
+    result.push({ ...q, options });
+  }
+  return result;
+}
+
+export async function getRandomQuizQuestions(
+  db: SQLiteDatabase,
+  limit: number,
+): Promise<(QuizQuestion & { options: QuizOption[] })[]> {
+  const questions = await db.getAllAsync<QuizQuestion>(
+    "SELECT * FROM quiz_questions ORDER BY RANDOM() LIMIT ?",
+    [limit],
+  );
+  const result: (QuizQuestion & { options: QuizOption[] })[] = [];
+  for (const q of questions) {
+    const options = await db.getAllAsync<QuizOption>("SELECT * FROM quiz_options WHERE question_id = ? ORDER BY id", [
+      q.id,
+    ]);
+    result.push({ ...q, options });
+  }
+  return result;
 }

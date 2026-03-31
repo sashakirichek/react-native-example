@@ -10,8 +10,12 @@ import {
   getQuizQuestions,
   getReferences,
   getTopic,
+  getTopicCategories,
+  listCategories,
   saveMemo,
   saveQuizQuestions,
+  setTopicCategories,
+  type Category,
   type Memo,
   type Reference,
   type Topic,
@@ -33,6 +37,9 @@ export default function TopicDetailScreen() {
   const [references, setReferences] = useState<Reference[]>([]);
   const [quizCount, setQuizCount] = useState(0);
   const [generating, setGenerating] = useState(false);
+  const [topicCategories, setTopicCats] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [editingCategories, setEditingCategories] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -44,6 +51,8 @@ export default function TopicDetailScreen() {
       setReferences(await getReferences(db, topicId));
       const questions = await getQuizQuestions(db, topicId);
       setQuizCount(questions.length);
+      setTopicCats(await getTopicCategories(db, topicId));
+      setAllCategories(await listCategories(db));
     }
   }, [db, id]);
 
@@ -115,6 +124,14 @@ export default function TopicDetailScreen() {
     ]);
   };
 
+  const handleToggleCategory = async (catId: number) => {
+    if (!topic) return;
+    const current = topicCategories.map((c) => c.id);
+    const updated = current.includes(catId) ? current.filter((cid) => cid !== catId) : [...current, catId];
+    await setTopicCategories(db, topic.id, updated);
+    setTopicCats(await getTopicCategories(db, topic.id));
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.systemGroupedBackground }]}
@@ -128,6 +145,51 @@ export default function TopicDetailScreen() {
         <Text style={[styles.dateText, { color: colors.secondaryLabel }]}>
           Created {new Date(topic.created_at).toLocaleDateString()}
         </Text>
+      </View>
+
+      {/* Categories */}
+      <View style={[styles.section, { backgroundColor: colors.secondaryGroupedBackground }]}>
+        <View style={styles.categoryHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.label, marginBottom: 0 }]}>Categories</Text>
+          <Pressable onPress={() => setEditingCategories((v) => !v)}>
+            <Text style={{ color: colors.blue, ...iOS18Typography.subheadline }}>
+              {editingCategories ? "Done" : "Edit"}
+            </Text>
+          </Pressable>
+        </View>
+        {editingCategories ? (
+          <View style={styles.chipContainer}>
+            {allCategories.map((cat) => {
+              const active = topicCategories.some((tc) => tc.id === cat.id);
+              return (
+                <Pressable
+                  key={cat.id}
+                  style={[styles.chip, { backgroundColor: active ? colors.blue : colors.tertiaryFill }]}
+                  onPress={() => handleToggleCategory(cat.id)}
+                >
+                  <Text style={[styles.chipText, { color: active ? "#fff" : colors.label }]}>{cat.name}</Text>
+                </Pressable>
+              );
+            })}
+            {allCategories.length === 0 && (
+              <Text style={{ color: colors.tertiaryLabel, ...iOS18Typography.footnote }}>
+                Create categories in the New Topic or Quiz tab.
+              </Text>
+            )}
+          </View>
+        ) : topicCategories.length > 0 ? (
+          <View style={styles.chipContainer}>
+            {topicCategories.map((cat) => (
+              <View key={cat.id} style={[styles.chip, { backgroundColor: colors.tertiaryFill }]}>
+                <Text style={[styles.chipText, { color: colors.label }]}>{cat.name}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={{ color: colors.tertiaryLabel, ...iOS18Typography.footnote, marginTop: 6 }}>
+            No categories assigned.
+          </Text>
+        )}
       </View>
 
       {/* Source preview */}
@@ -281,4 +343,8 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   deleteButtonText: { ...iOS18Typography.body, fontWeight: "500" },
+  categoryHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  chipContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  chipText: { ...iOS18Typography.subheadline, fontWeight: "500" },
 });

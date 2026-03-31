@@ -4,13 +4,25 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from "react-native";
-import { getQuizQuestions, saveQuizAttempt, type QuizOption, type QuizQuestion } from "../db/repository";
+import {
+  getQuizQuestions,
+  getQuizQuestionsByCategories,
+  getRandomQuizQuestions,
+  saveQuizAttempt,
+  type QuizOption,
+  type QuizQuestion,
+} from "../db/repository";
 import { getColors, iOS18Components, iOS18Typography } from "../theme/ios18";
 
 type QuestionWithOptions = QuizQuestion & { options: QuizOption[] };
 
 export default function QuizScreen() {
-  const { topicId } = useLocalSearchParams<{ topicId: string }>();
+  const { topicId, mode, count, categoryIds } = useLocalSearchParams<{
+    topicId: string;
+    mode?: string;
+    count?: string;
+    categoryIds?: string;
+  }>();
   const db = useSQLiteContext();
   const router = useRouter();
   const isDark = useColorScheme() === "dark";
@@ -25,16 +37,25 @@ export default function QuizScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!topicId) return;
-      getQuizQuestions(db, Number(topicId)).then((qs) => {
+      const loadQuestions = async () => {
+        let qs: QuestionWithOptions[] = [];
+        if (mode === "random") {
+          qs = await getRandomQuizQuestions(db, Number(count) || 10);
+        } else if (mode === "categories" && categoryIds) {
+          const ids = categoryIds.split(",").map(Number).filter(Boolean);
+          if (ids.length > 0) qs = await getQuizQuestionsByCategories(db, ids);
+        } else if (topicId && topicId !== "0") {
+          qs = await getQuizQuestions(db, Number(topicId));
+        }
         setQuestions(qs);
         setCurrentIndex(0);
         setSelectedOptionId(null);
         setRevealed(false);
         setScore(0);
         setFinished(false);
-      });
-    }, [db, topicId]),
+      };
+      loadQuestions();
+    }, [db, topicId, mode, count, categoryIds]),
   );
 
   if (questions.length === 0) {
@@ -91,9 +112,9 @@ export default function QuizScreen() {
 
   const handleNext = async () => {
     if (currentIndex === questions.length - 1) {
-      const finalScore =
-        score + (current.options.find((o) => o.id === selectedOptionId)?.is_correct && !revealed ? 1 : 0);
-      await saveQuizAttempt(db, Number(topicId), score, questions.length);
+      if (topicId && topicId !== "0" && !mode) {
+        await saveQuizAttempt(db, Number(topicId), score, questions.length);
+      }
       setFinished(true);
     } else {
       setCurrentIndex((i) => i + 1);

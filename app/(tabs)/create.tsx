@@ -1,7 +1,8 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -12,8 +13,9 @@ import {
   Text,
   TextInput,
   useColorScheme,
+  View,
 } from "react-native";
-import { addReference, createTopic } from "../db/repository";
+import { addReference, createCategory, createTopic, listCategories, setTopicCategories, type Category } from "../db/repository";
 import { normalizeText, stripHtml } from "../lib/text-processing";
 import { getColors, iOS18Components, iOS18Typography } from "../theme/ios18";
 
@@ -32,6 +34,39 @@ export default function CreateScreen() {
   const [topicText, setTopicText] = useState("");
   const [topicUrl, setTopicUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  useFocusEffect(
+    useCallback(() => {
+      listCategories(db).then(setCategories);
+    }, [db]),
+  );
+
+  const toggleCategory = (id: number) => {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    );
+  };
+
+  const handleAddCategory = async () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    if (categories.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+      Alert.alert("Exists", "A category with that name already exists.");
+      return;
+    }
+    try {
+      const id = await createCategory(db, name);
+      const updated = await listCategories(db);
+      setCategories(updated);
+      setSelectedCategoryIds((prev) => [...prev, id]);
+      setNewCategoryName("");
+    } catch {
+      Alert.alert("Error", "Failed to create category.");
+    }
+  };
 
   const isValid = () => {
     switch (mode) {
@@ -91,9 +126,14 @@ export default function CreateScreen() {
         await addReference(db, topicId, topicUrl.trim());
       }
 
+      if (selectedCategoryIds.length > 0) {
+        await setTopicCategories(db, topicId, selectedCategoryIds);
+      }
+
       setTopicName("");
       setTopicText("");
       setTopicUrl("");
+      setSelectedCategoryIds([]);
 
       router.push(`/topic/${topicId}` as any);
     } catch (error: any) {
@@ -159,6 +199,45 @@ export default function CreateScreen() {
           </>
         )}
 
+        <Text style={[styles.sectionTitle, { color: colors.secondaryLabel }]}>Categories</Text>
+        <View style={styles.chipContainer}>
+          {categories.map((cat) => {
+            const selected = selectedCategoryIds.includes(cat.id);
+            return (
+              <Pressable
+                key={cat.id}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: selected ? colors.blue : colors.tertiaryFill,
+                  },
+                ]}
+                onPress={() => toggleCategory(cat.id)}
+              >
+                <Text style={[styles.chipText, { color: selected ? "#fff" : colors.label }]}>{cat.name}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <View style={styles.addCategoryRow}>
+          <TextInput
+            style={[styles.input, styles.addCategoryInput, { backgroundColor: colors.tertiaryFill, color: colors.label }]}
+            placeholder="New category…"
+            placeholderTextColor={colors.tertiaryLabel}
+            value={newCategoryName}
+            onChangeText={setNewCategoryName}
+            onSubmitEditing={handleAddCategory}
+            returnKeyType="done"
+          />
+          <Pressable
+            style={[styles.addCategoryButton, { backgroundColor: colors.blue, opacity: newCategoryName.trim() ? 1 : 0.5 }]}
+            onPress={handleAddCategory}
+            disabled={!newCategoryName.trim()}
+          >
+            <Text style={styles.addCategoryButtonText}>Add</Text>
+          </Pressable>
+        </View>
+
         <Pressable
           style={[styles.createButton, !isValid() && styles.createButtonDisabled]}
           onPress={handleCreate}
@@ -189,6 +268,17 @@ const styles = StyleSheet.create({
     ...iOS18Typography.body,
   },
   textArea: { minHeight: 160 },
+  chipContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  chip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 16 },
+  chipText: { ...iOS18Typography.subheadline, fontWeight: "500" },
+  addCategoryRow: { flexDirection: "row", gap: 8, marginTop: 10 },
+  addCategoryInput: { flex: 1 },
+  addCategoryButton: {
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    borderRadius: iOS18Components.buttonRadius,
+  },
+  addCategoryButtonText: { color: "#fff", ...iOS18Typography.subheadline, fontWeight: "600" },
   createButton: {
     marginTop: 24,
     padding: 16,
